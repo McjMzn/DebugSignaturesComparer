@@ -34,6 +34,6 @@ jobs:
         # nuget source list
         # nuget setApiKey "$NUGET_API_KEY" -source https://api.nuget.org/v3/index.json
         nuget setApiKey "$NUGET_API_KEY"
-        nuget push $(find -name '*.nupkg') -ApiKey "$NUGET_API_KEY"
+        nuget push $(find -name '*.nupkg') -Source https://api.nuget.org/v3/index.json -ApiKey "$NUGET_API_KEY"
  
 
