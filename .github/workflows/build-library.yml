@@ -11,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
