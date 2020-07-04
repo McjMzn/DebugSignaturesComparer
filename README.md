@@ -1,5 +1,6 @@
 # Debug Signatures Comparer
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
+![publish-build](https://github.com/McjMzn/DebugSignaturesComparer/workflows/publish-build/badge.svg)
 
 Read files' debug signatures. Check if executable matches the debugging symbols (DLL matches PDB) or if NuGet package matches the symbols package (NUPKG matches SNUPKG). Either programatically, or with CLI or with GUI application!
 
