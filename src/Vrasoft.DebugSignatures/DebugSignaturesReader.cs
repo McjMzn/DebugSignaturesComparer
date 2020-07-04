@@ -8,24 +8,47 @@ using System.Reflection.PortableExecutable;
 
 namespace Vrasoft.DebugSignatures
 {
+    /// <summary>
+    /// Class that allows reading debug signature from: DLLs, EXEs, PDBs, NuGet packages, ZIP archives and directories.
+    /// </summary>
     public class DebugSignaturesReader
     {
-        public static DebugSignatureReading ReadFromExecutable(string executablePath)
+        public static string[] ProgramDatabaseExtensions = new[] { ".pdb" };
+        public static string[] PortableExecutableExtensions = new[] { ".dll", ".exe", ".sys" };
+        public static string[] ArchiveExtensions = new[] { ".zip", ".nupkg", ".snupkg" };
+        public static string[] SupportedExtensions = PortableExecutableExtensions.Concat(ArchiveExtensions).Concat(ProgramDatabaseExtensions).ToArray();
+
+        /// <summary>
+        /// Reads the debug signature from the given Portable Executable (i.e. DLL or EXE.) file.
+        /// </summary>
+        /// <param name="portableExecutable">Path to the PE file.</param>
+        /// <returns>Debug signature reading.</returns>
+        public static DebugSignatureReading ReadFromPortableExecutable(string portableExecutable)
         {
-            using (var dllStream = File.OpenRead(executablePath))
+            using (var portableExecutableStream = File.OpenRead(portableExecutable))
             {
-                return new DebugSignatureReading(executablePath, ReadFromExecutableStream(dllStream));
+                return new DebugSignatureReading(portableExecutable, ReadFromPortableExecutableStream(portableExecutableStream));
             }
         }
 
-        public static DebugSignatureReading ReadFromPdb(string pdbPath)
+        /// <summary>
+        /// Reads the debug signature from the given Program Database (PDB) file.
+        /// </summary>
+        /// <param name="executablePath">Path to the PDB file.</param>
+        /// <returns>Debug signature reading.</returns>
+        public static DebugSignatureReading ReadFromProgramDatabase(string pdbPath)
         {
             using (var pdbStream = File.OpenRead(pdbPath))
             {
-                return new DebugSignatureReading(pdbPath, ReadFromPdbStream(pdbStream));
+                return new DebugSignatureReading(pdbPath, ReadFromProgramDatabase(pdbStream));
             }
         }
 
+        /// <summary>
+        /// Reads the debug signatures of DLLs, EXEs, PDBs, NUPKGs, SNUPKGs and ZIPs that the given archive contains.
+        /// </summary>
+        /// <param name="executablePath">Path to the archive.</param>
+        /// <returns>List of debug signature readings.</returns>
         public static List<DebugSignatureReading> ReadFromArchive(string packagePath)
         {
             var signatures = new List<DebugSignatureReading>();
@@ -33,11 +56,10 @@ namespace Vrasoft.DebugSignatures
             {
                 archive.Entries.ToList().ForEach(packedFile =>
                 {
-                    var isDll = packedFile.Name.EndsWith(".dll");
-                    var isPdb = packedFile.Name.EndsWith(".pdb");
-                    var isExe = packedFile.Name.EndsWith(".exe");
+                    var isExe = PortableExecutableExtensions.Contains(Path.GetExtension(packedFile.Name));
+                    var isPdb = ProgramDatabaseExtensions.Contains(packedFile.Name);
 
-                    if (isDll || isPdb || isExe)
+                    if (isExe || isPdb)
                     {
                         using (var packedFileStream = packedFile.Open())
                         using (var memoryStream = new MemoryStream())
@@ -46,10 +68,9 @@ namespace Vrasoft.DebugSignatures
                             packedFileStream.CopyTo(memoryStream);
                             memoryStream.Position = 0;
 
-                            var signature = isPdb ? ReadFromPdbStream(memoryStream) : ReadFromExecutableStream(memoryStream);
+                            var signature = isPdb ? ReadFromProgramDatabase(memoryStream) : ReadFromPortableExecutableStream(memoryStream);
                             signatures.Add(new DebugSignatureReading($"[{packagePath}]/{packedFile.FullName}", signature));
                         }
-
                     }
                 });
 
@@ -57,30 +78,35 @@ namespace Vrasoft.DebugSignatures
             }
         }
 
+        /// <summary>
+        /// Reads the debug signatures of DLLs, EXEs, PDBs, NUPKGs, SNUPKGs and ZIPs that the given directory contains.
+        /// <para>ATTENTION: This method will not throw if any reading fails. Returns only the successful results.</para>
+        /// </summary>
+        /// <param name="executablePath">Path to the directory.</param>
+        /// <returns>List of debug signature readings.</returns>
         public static List<DebugSignatureReading> ReadFromDirectory(string directoryPath)
         {
-            var supportedExtensions = new[] { ".dll", ".exe", ".pdb", ".zip", ".nupkg", ".snupkg" };
-            var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(file => supportedExtensions.Contains(Path.GetExtension(file)));
+            var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(file => SupportedExtensions.Contains(Path.GetExtension(file)));
             var signatures = new List<DebugSignatureReading>();
 
             foreach (var file in files)
             {
                 try
                 {
-                    if (file.EndsWith(".pdb"))
+                    if (ProgramDatabaseExtensions.Contains(file))
                     {
-                        signatures.Add(ReadFromPdb(file));
+                        signatures.Add(ReadFromProgramDatabase(file));
                     }
-                    else if (file.EndsWith(".dll") || file.EndsWith(".exe"))
+                    else if (PortableExecutableExtensions.Contains(Path.GetExtension(file)))
                     {
-                        signatures.Add(ReadFromExecutable(file));
+                        signatures.Add(ReadFromPortableExecutable(file));
                     }
-                    else
+                    else if (ArchiveExtensions.Contains(Path.GetExtension(file)))
                     {
                         signatures.AddRange(ReadFromArchive(file));
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     // Just don't add the reading to results.
                 }
@@ -89,7 +115,7 @@ namespace Vrasoft.DebugSignatures
             return signatures;
         }
 
-        private static string ReadFromExecutableStream(Stream inputStream)
+        private static string ReadFromPortableExecutableStream(Stream inputStream)
         {
             using (var peReader = new PEReader(inputStream))
             {
@@ -100,7 +126,7 @@ namespace Vrasoft.DebugSignatures
             }
         }
 
-        private static string ReadFromPdbStream(Stream pdbStream)
+        private static string ReadFromProgramDatabase(Stream pdbStream)
         {
             var metadataProvider = MetadataReaderProvider.FromPortablePdbStream(pdbStream);
             var metadataReader = metadataProvider.GetMetadataReader();

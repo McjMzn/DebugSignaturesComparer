@@ -5,22 +5,43 @@ using System.Linq;
 
 namespace Vrasoft.DebugSignatures
 {
+    /// <summary>
+    /// Class used to trigger signature readings and group them by the signature's value.
+    /// </summary>
     public class DebugSignaturesComparer
     {
+        /// <summary>
+        /// Invoked when an error occures during processing.
+        /// </summary>
         public EventHandler<string> ProcessingError;
 
+        /// <summary>
+        /// List of successfull readings done by this instance.
+        /// </summary>
         public IList<DebugSignatureReading> Readings { get; set; } = new List<DebugSignatureReading>();
+        
+        /// <summary>
+        /// Readings grouped by the signature ordered by the number of files within group in descending order.
+        /// </summary>
         public IList<IGrouping<string, DebugSignatureReading>> ReadingsBySignature =>
             Readings
                 .GroupBy(reading => reading.DebugSignature)
                 .OrderByDescending(readings => readings.Count())
                 .ToList();
 
+        /// <summary>
+        /// Adds file to the comparison - reads its debug signature and adds the result to <see cref="Readings"/> and <see cref="ReadingsBySignature"/>if it succeeeds.
+        /// </summary>
+        /// <param name="path">Path to the file.</param>
         public void AddFile(string path)
         {
             AddFiles(new[] { path });
         }
 
+        /// <summary>
+        /// Adds files to the comparison - reads their debug signature and adds the results to <see cref="Readings"/> and <see cref="ReadingsBySignature"/>if they succeeed.
+        /// </summary>
+        /// <param name="path">Paths to files.</param>
         public void AddFiles(IEnumerable<string> paths)
         {
             foreach (var path in paths)
@@ -29,13 +50,13 @@ namespace Vrasoft.DebugSignatures
                 {
                     switch (path)
                     {
-                        case string pdbPath when File.Exists(pdbPath) && pdbPath.EndsWith(".pdb"):
-                            Readings.Add(DebugSignaturesReader.ReadFromPdb(pdbPath));
+                        case string pdbPath when File.Exists(pdbPath) && DebugSignaturesReader.ProgramDatabaseExtensions.Contains(Path.GetExtension(pdbPath)):
+                            Readings.Add(DebugSignaturesReader.ReadFromProgramDatabase(pdbPath));
                             break;
-                        case string executablePath when File.Exists(executablePath) && (executablePath.EndsWith(".dll") || executablePath.EndsWith(".exe")):
-                            Readings.Add(DebugSignaturesReader.ReadFromExecutable(executablePath));
+                        case string exePath when File.Exists(exePath) && DebugSignaturesReader.PortableExecutableExtensions.Contains(Path.GetExtension(exePath)):
+                            Readings.Add(DebugSignaturesReader.ReadFromPortableExecutable(exePath));
                             break;
-                        case string archivePath when File.Exists(archivePath) && (archivePath.EndsWith(".nupkg") || archivePath.EndsWith(".snupkg") || archivePath.EndsWith(".zip")):
+                        case string archivePath when File.Exists(archivePath) && DebugSignaturesReader.ArchiveExtensions.Contains(Path.GetExtension(archivePath)):
                             DebugSignaturesReader.ReadFromArchive(archivePath).ForEach(Readings.Add);
                             break;
                         case string directoryPath when Directory.Exists(directoryPath):

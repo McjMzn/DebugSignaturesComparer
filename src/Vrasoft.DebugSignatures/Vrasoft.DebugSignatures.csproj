@@ -2,9 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>DebugSignatures.Reader</AssemblyName>
-    <Version>0.2.1</Version>
+    <Version>1.0.0</Version>
     <Author>McjMzn</Author>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/McjMzn/DebugSignaturesComparer</PackageProjectUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Description>Contais utility classes that can be used to check debug signatures of files. Allows reading Portable Executable (e.g. DLL, EXE) and Program Database (PDB) files. Also ones that are packed into ZIP archive or NuGet package.
+
+This package also provides a class that can be used to group readings by the signatures to determine if the executable files match the program databases.
+</Description>
+    <RepositoryUrl>https://github.com/McjMzn/DebugSignaturesComparer</RepositoryUrl>
+    <PackageTags>pdb, pe, dll, signature, portable executable, program database, debug, debugging, signature reader</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
