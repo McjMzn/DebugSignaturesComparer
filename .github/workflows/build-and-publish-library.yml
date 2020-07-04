@@ -1,4 +1,4 @@
-name: BuildAndPublish
+name: build-and-publish-library
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  publish-library:
+  build-and-publish-library:
     runs-on: ubuntu-latest
     
     steps:
@@ -16,13 +16,8 @@ jobs:
       with:
         dotnet-version: 3.1.101
       env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
-          
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}   
+            
     - name: Build library
       working-directory: ./src/Vrasoft.DebugSignatures
       run: dotnet build -c Release
@@ -35,7 +30,6 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        echo $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.nupkg')
-        echo $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.snupkg')
+        echo 'test'
  
 
