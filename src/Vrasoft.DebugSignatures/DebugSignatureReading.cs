@@ -16,7 +16,7 @@
         public string DebugSignature { get; }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="DebugSignatureReading"/>
+        /// Initializes a new instance of <see cref="DebugSignatureReading"/>.
         /// </summary>
         /// <param name="file">Path to the file.</param>
         /// <param name="debugSignature">Value of the debug signature.</param>
