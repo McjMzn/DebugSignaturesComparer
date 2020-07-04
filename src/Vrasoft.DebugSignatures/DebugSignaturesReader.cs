@@ -93,7 +93,7 @@ namespace Vrasoft.DebugSignatures
             {
                 try
                 {
-                    if (ProgramDatabaseExtensions.Contains(file))
+                    if (ProgramDatabaseExtensions.Contains(Path.GetExtension(file)))
                     {
                         signatures.Add(ReadFromProgramDatabase(file));
                     }
