@@ -15,9 +15,7 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
-    - uses: NuGet/setup-nuget@v1.0.2
-      env:
-        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}   
+    - uses: NuGet/setup-nuget@v1.0.2 
             
     - name: Build library
       working-directory: ./src/Vrasoft.DebugSignatures
@@ -30,6 +28,8 @@ jobs:
         path: src/Vrasoft.DebugSignatures/bin/Release/*nupkg
       
     - name: Publish NuGet packages
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }} 
       run: |
         # nuget source list
         # nuget setApiKey "$NUGET_API_KEY" -source https://api.nuget.org/v3/index.json
