@@ -45,7 +45,9 @@ jobs:
         path: local_nuget
       
     - name: Set local NuGet repository
-      run: dotnet nuget add source local_nuget -n local_nuget
+      run: |
+        cd local_nuget
+        dotnet nuget add source . -n local_nuget
         
     - name: Build CLI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
