@@ -60,7 +60,7 @@ namespace Vrasoft.DebugSignatures.ComparerCli
 
             var border = $"{new String('_', windowWidth)}{Environment.NewLine}";
 
-            var header = $"{border}{FormatLine("Debug Signatures Comparer")}{ FormatLine("0.1.0")}{ FormatLine("github.com/mcjmzn")}{ border}";
+            var header = $"{border}{FormatLine("Debug Signatures Comparer CLI")}{ FormatLine("1.0.0")}{ FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{ border}";
             Console.WriteLine(header);
         }
 

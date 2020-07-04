@@ -5,13 +5,13 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <AssemblyName>DebugSignaturesComparerGui</AssemblyName>
-    <Version>1.0.0</Version>
+    <Version>1.0.2</Version>
     <Author>McjMzn</Author>
     <Copyright>McjMzn</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Vrasoft.DebugSignatures" Version="1.0.1" />
+    <PackageReference Include="Vrasoft.DebugSignatures" Version="1.0.2" />
   </ItemGroup>
 
 </Project>
