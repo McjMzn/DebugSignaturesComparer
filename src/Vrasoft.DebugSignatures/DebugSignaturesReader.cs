@@ -78,43 +78,6 @@ namespace Vrasoft.DebugSignatures
             }
         }
 
-        /// <summary>
-        /// Reads the debug signatures of DLLs, EXEs, PDBs, NUPKGs, SNUPKGs and ZIPs that the given directory contains.
-        /// <para>ATTENTION: This method will not throw if any reading fails. Returns only the successful results.</para>
-        /// </summary>
-        /// <param name="executablePath">Path to the directory.</param>
-        /// <returns>List of debug signature readings.</returns>
-        public static List<DebugSignatureReading> ReadFromDirectory(string directoryPath)
-        {
-            var files = Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories).Where(file => SupportedExtensions.Contains(Path.GetExtension(file)));
-            var signatures = new List<DebugSignatureReading>();
-
-            foreach (var file in files)
-            {
-                try
-                {
-                    if (ProgramDatabaseExtensions.Contains(Path.GetExtension(file)))
-                    {
-                        signatures.Add(ReadFromProgramDatabase(file));
-                    }
-                    else if (PortableExecutableExtensions.Contains(Path.GetExtension(file)))
-                    {
-                        signatures.Add(ReadFromPortableExecutable(file));
-                    }
-                    else if (ArchiveExtensions.Contains(Path.GetExtension(file)))
-                    {
-                        signatures.AddRange(ReadFromArchive(file));
-                    }
-                }
-                catch
-                {
-                    // Just don't add the reading to results.
-                }
-            }
-
-            return signatures;
-        }
-
         private static string ReadFromPortableExecutableStream(Stream inputStream)
         {
             using (var peReader = new PEReader(inputStream))
