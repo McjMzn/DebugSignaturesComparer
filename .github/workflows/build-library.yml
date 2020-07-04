@@ -1,4 +1,4 @@
-name: BuildLibrary
+name: BuildAndPublish
 
 on:
   push:
@@ -7,10 +7,12 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  publish-library:
     runs-on: ubuntu-latest
     
     steps:
+    - env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
     - uses: actions/checkout@v2
     - uses: actions/setup-dotnet@v1
       with:
@@ -33,9 +35,7 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        NUPKG = $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.nupkg')
-        SNUPKG = $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.snupkg')
-        echo $NUPKG
-        echo $SNUPKG
+        echo $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.nupkg')
+        echo $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.snupkg')
  
 
