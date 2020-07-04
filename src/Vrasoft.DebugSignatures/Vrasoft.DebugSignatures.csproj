@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>DebugSignatures.Reader</AssemblyName>
+    <Version>0.2.1</Version>
+    <Author>McjMzn</Author>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Reflection.Metadata" Version="1.8.1" />
+  </ItemGroup>
+
+</Project>
