@@ -30,6 +30,7 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        echo 'test'
+        dotnet nuget push $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.nupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
+        dotnet nuget push $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.snupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
  
 
