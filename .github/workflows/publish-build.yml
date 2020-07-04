@@ -27,7 +27,9 @@ jobs:
     - name: Publish NuGet packages
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }} 
-      run: dotnet nuget push $(find -name '*.nupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY" --skip-duplicate
+      run: |
+        dotnet nuget push $(find -name '*.nupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY" --skip-duplicate --no-symbols true
+        dotnet nuget push $(find -name '*.snupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY" --skip-duplicate
       
   build-cli-and-gui:
     runs-on: windows-latest
@@ -37,14 +39,27 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+      
+    - name: Download built NuGet packages
+      uses: actions/download-artifact@v2
+      with:
+        name: built-nuget-packages
+        path: local_nuget
+      
+    - name: Set local NuGet repository
+      run: |
+        cd local_nuget
+        dotnet nuget add source . -n local_nuget
+        
     - name: Build CLI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
+      
     - name: Build GUI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerGui -c Release -o Build
       
     - name: Save build artifact
       uses: actions/upload-artifact@v2
       with:
-        name: DebugSignaturesComparerApp
+        name: debug-signatures-comparer-app
         path: ./Build
 
