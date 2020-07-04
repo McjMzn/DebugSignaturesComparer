@@ -16,7 +16,12 @@ namespace Vrasoft.DebugSignatures.ComparerGui
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<DebugSignatureReading> Readings => comparer.Readings as ObservableCollection<DebugSignatureReading>;
-        public Dictionary<string, List<DebugSignatureReading>> ReadingsBySignature => comparer.ReadingsBySignature.ToDictionary(group => group.Key, group => group.ToList());
+        public Dictionary<string, List<DebugSignatureReading>> ReadingsBySignature =>
+            this.Readings
+                .GroupBy(reading => reading.DebugSignature)
+                .OrderByDescending(readings => readings.Count())
+                .ToDictionary(group => group.Key, group => group.ToList());
+
         public string Log
         {
             get => log;

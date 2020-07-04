@@ -34,13 +34,15 @@ namespace Vrasoft.DebugSignatures.ComparerCli
 
         static void PrintReadings(DebugSignaturesComparer comparer)
         {
-            comparer.ReadingsBySignature.ToList().ForEach(group =>
+            comparer.ReadingsBySignature.Keys.ToList().ForEach(signature =>
             {
-                Console.WriteLine($"Signature: {group.Key}");
+                var files = comparer.ReadingsBySignature[signature];
+
+                Console.WriteLine($"Signature: {signature}");
                 Console.WriteLine("Files:");
 
-                Console.ForegroundColor = group.Count() > 1 ? ConsoleColor.Green : ConsoleColor.Gray;
-                group.ToList().ForEach(file => Console.WriteLine($"  {file.File}"));
+                Console.ForegroundColor = files.Count > 1 ? ConsoleColor.Green : ConsoleColor.Gray;
+                files.ForEach(file => Console.WriteLine($"  {file.File}"));
                 Console.ResetColor();
 
                 Console.WriteLine();
@@ -60,7 +62,7 @@ namespace Vrasoft.DebugSignatures.ComparerCli
 
             var border = $"{new String('_', windowWidth)}{Environment.NewLine}";
 
-            var header = $"{border}{FormatLine("Debug Signatures Comparer CLI")}{ FormatLine("1.0.3")}{ FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{ border}";
+            var header = $"{border}{FormatLine("Debug Signatures Comparer CLI")}{FormatLine("1.1.0")}{FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{border}";
             Console.WriteLine(header);
         }
 
