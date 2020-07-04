@@ -1,4 +1,4 @@
-name: Build
+name: BuildLibrary
 
 on:
   push:
@@ -28,12 +28,8 @@ jobs:
     - name: Save NuGet package
       uses: actions/upload-artifact@v2
       with:
-          path: src/Vrasoft.DebugSignatures/bin/Release/*.nupkg
-      
-    - name: Save NuGet symbols package
-      uses: actions/upload-artifact@v2
-      with:
-          path: src/Vrasoft.DebugSignatures/bin/Release/*.snupkg
+        name: nuget 
+        path: src/Vrasoft.DebugSignatures/bin/Release/*nupkg
                   
  
 
