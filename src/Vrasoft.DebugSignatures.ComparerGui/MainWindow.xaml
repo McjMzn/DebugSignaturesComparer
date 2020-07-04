@@ -60,8 +60,8 @@
                         <DataTemplate>
                             <Border Style="{StaticResource ReadingGroup}" DataContext="{Binding}">
                                 <StackPanel>
-                                <Label Content="{Binding Key, Mode=OneWay}" Style="{StaticResource ReadingGroupHeader}" FontSize="15" HorizontalAlignment="Center" FontWeight="Bold"/>
-                                <ItemsControl ItemsSource="{Binding Value, Mode=OneWay}">
+                                    <Label Content="{Binding Key, Mode=OneWay}" Style="{StaticResource ReadingGroupHeader}" FontSize="15" HorizontalAlignment="Center" FontWeight="Bold"/>
+                                    <ItemsControl ItemsSource="{Binding Value, Mode=OneWay}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <Label FontSize="13" HorizontalAlignment="Center" ToolTip="{Binding File}">
