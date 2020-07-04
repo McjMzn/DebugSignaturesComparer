@@ -5,7 +5,7 @@ Read files' debug signatures. Check if executable matches the debugging symbols 
 
 ## Debug Signatures Library
 ![Platform](https://img.shields.io/badge/.NET%20Standard-2.0-blue)
-![Nuget](https://img.shields.io/nuget/v/Vrasoft.DebugSignatures)
+[![Nuget](https://img.shields.io/nuget/v/Vrasoft.DebugSignatures)](https://www.nuget.org/packages/Vrasoft.DebugSignatures/)
 
 Available as [NuGet package](https://www.nuget.org/packages/Vrasoft.DebugSignatures/), contais utility classes that can be used to check and compare debug signatures of files. Supports Portable Executables, Program Databases and ZIP Archives.
 
