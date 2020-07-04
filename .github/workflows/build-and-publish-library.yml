@@ -30,6 +30,6 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        dotnet nuget push $(find -name '*.nupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
+        dotnet nuget push $(find -name '*.nupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY"
  
 
