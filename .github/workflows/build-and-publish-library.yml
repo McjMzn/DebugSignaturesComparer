@@ -34,6 +34,6 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        nuget push $(find -name '*.nupkg') -s nuget.org
+        nuget push $(find -name '*.nupkg') -source nuget.org -skipDuplicate
  
 
