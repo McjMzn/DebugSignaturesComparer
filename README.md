@@ -1,11 +1,12 @@
 # Debug Signatures Comparer
 [![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://github.com/tterb/atomic-design-ui/blob/master/LICENSEs)
-[![HitCount](http://hits.dwyl.com/McjMzn/DebugSignaturesComparer.svg)](http://hits.dwyl.com/McjMzn/DebugSignaturesComparer)
-[![Github All Releases](https://img.shields.io/github/downloads/McjMzn/DebugSignaturesComparer/total.svg?style=flat)]()
 
 Read files' debug signatures. Check if executable matches the debugging symbols (DLL matches PDB) or if NuGet package matches the symbols package (NUPKG matches SNUPKG). Either programatically, or with CLI or with GUI application!
 
 ## Debug Signatures Library
+![Platform](https://img.shields.io/badge/.NET%20Standard-2.0-blue)
+![Nuget](https://img.shields.io/nuget/v/Vrasoft.DebugSignatures)
+
 Available as [NuGet package](https://www.nuget.org/packages/Vrasoft.DebugSignatures/), contais utility classes that can be used to check and compare debug signatures of files. Supports Portable Executables, Program Databases and ZIP Archives.
 
 ```c#
@@ -23,7 +24,15 @@ Available as [NuGet package](https://www.nuget.org/packages/Vrasoft.DebugSignatu
 ```
 
 ## Debug Signatures Comparer CLI
+![Platform](https://img.shields.io/badge/.NET%20Core-3.0-blue)
+![Platform](https://img.shields.io/badge/OS-Windows%20|%20Linux%20|%20MacOS-lightgrey)
+
 Compare debug signatures directly from command line interface.
+![cli-image-1](https://i.imgur.com/K6NlOxY.png "Debug Signatures Comparer CLI")
 
 ## Debug Signatures Comparer GUI
+![Platform](https://img.shields.io/badge/.NET%20Core-3.0%20WPF-blue)
+![Platform](https://img.shields.io/badge/OS-Windows-lightgrey)
+
 Simple Drag-and-Drop application allowing to easily check if files have matching debug signature.
+![cli-image-1](https://i.imgur.com/3CxTfea.png "Debug Signatures Comparer GUI")
