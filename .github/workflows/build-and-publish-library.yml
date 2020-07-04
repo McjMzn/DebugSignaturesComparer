@@ -38,12 +38,11 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - name: Build CLI
-      working-directory: ./src/
-      run: |
-        dotnet build ./src/Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
-        dotnet build Vrasoft.DebugSignatures.ComparerGui -c Release -o Build
-  
-    - name: Save application build
+      run: dotnet build Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
+    - name: Build GUI
+      run: dotnet build Vrasoft.DebugSignatures.ComparerGui -c Release -o Build
+      
+    - name: Save build artifact
       uses: actions/upload-artifact@v2
       with:
         name: DebugSignaturesComparerApp
