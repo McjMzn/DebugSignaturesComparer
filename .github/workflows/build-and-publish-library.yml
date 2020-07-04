@@ -34,9 +34,9 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        nuget source list
+        # nuget source list
         # nuget setApiKey "$NUGET_API_KEY"
         # nuget setApiKey "$NUGET_API_KEY" -source https://api.nuget.org/v3/index.json
-        nuget push $(find -name '*.snupkg') -source https://www.nuget.org/api/v2/ -ApiKey "$NUGET_API_KEY"
+        nuget push $(find -name '*.nupkg') -source https://www.nuget.org/api/v2/ -ApiKey "$NUGET_API_KEY"
  
 
