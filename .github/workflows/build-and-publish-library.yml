@@ -34,6 +34,6 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        nuget push $(find -name '*.nupkg') -source https://api.nuget.org/v3/index.json -skipDuplicate
+        nuget push $(find -name '*.snupkg') -source https://api.nuget.org/v3/index.json -skipDuplicate
  
 
