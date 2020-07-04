@@ -1,4 +1,4 @@
-name: build-and-publish-library
+name: publish-nuget
 
 on:
   push:
@@ -30,7 +30,6 @@ jobs:
       
     - name: Publish NuGet packages
       run: |
-        dotnet nuget push $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.nupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
-        dotnet nuget push $(find src/Vrasoft.DebugSignatures/bin/Release/ -name '*.snupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
+        dotnet nuget push $(find -name '*.nupkg') -k "$NUGET_API_KEY" -s https://api.nuget.org/v3/index.json
  
 
