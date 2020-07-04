@@ -25,11 +25,17 @@ jobs:
       working-directory: ./src/Vrasoft.DebugSignatures
       run: dotnet build -c Release
     
-    - name: Save NuGet package
+    - name: Save NuGet packages
       uses: actions/upload-artifact@v2
       with:
-        name: nuget 
+        name: built-nuget-packages
         path: src/Vrasoft.DebugSignatures/bin/Release/*nupkg
-                  
+      
+    - name: Publish NuGet packages
+      run: |
+        NUPKG = $(find src/Vrasoft.DebugSignatures/bin/Release/ '*.nupkg')
+        SNUPKG = $(find src/Vrasoft.DebugSignatures/bin/Release/ '*.snupkg')
+        echo $NUPKG
+        echo $SNUPKG
  
 
