@@ -37,6 +37,20 @@ jobs:
     - uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.301
+      
+    - name: Download built NuGet
+      uses: actions/download-artifact@v2
+      with:
+        name: built-nuget-packages
+        path: local_nuget
+      
+    - name: Set local NuGet repository
+      run: |
+        cd local_nuget
+        dir
+        tar -xf built-nuget-packages
+        dotnet nuget add source . -n local_nuget
+        
     - name: Build CLI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
     - name: Build GUI
