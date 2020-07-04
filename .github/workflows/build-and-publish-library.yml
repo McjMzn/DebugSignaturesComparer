@@ -16,9 +16,6 @@ jobs:
       with:
         dotnet-version: 3.1.301
     - uses: NuGet/setup-nuget@v1.0.2
-      with:
-        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-        nuget-api-key-source: https://www.nuget.org/api/v2/
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}   
             
@@ -35,8 +32,8 @@ jobs:
     - name: Publish NuGet packages
       run: |
         # nuget source list
-        # nuget setApiKey "$NUGET_API_KEY"
         # nuget setApiKey "$NUGET_API_KEY" -source https://api.nuget.org/v3/index.json
-        nuget push $(find -name '*.nupkg') -source https://www.nuget.org/api/v2/ -ApiKey "$NUGET_API_KEY"
+        nuget setApiKey "$NUGET_API_KEY"
+        nuget push $(find -name '*.nupkg') -ApiKey "$NUGET_API_KEY"
  
 
