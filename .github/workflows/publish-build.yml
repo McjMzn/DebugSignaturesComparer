@@ -38,27 +38,24 @@ jobs:
       with:
         dotnet-version: 3.1.301
       
-    - name: Download built NuGet
+    - name: Download built NuGet packages
       uses: actions/download-artifact@v2
       with:
         name: built-nuget-packages
         path: local_nuget
       
     - name: Set local NuGet repository
-      run: |
-        cd local_nuget
-        dir
-        tar -xf built-nuget-packages
-        dotnet nuget add source . -n local_nuget
+      run: dotnet nuget add source local_nuget -n local_nuget
         
     - name: Build CLI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerCli -c Release -o Build
+      
     - name: Build GUI
       run: dotnet build ./src/Vrasoft.DebugSignatures.ComparerGui -c Release -o Build
       
     - name: Save build artifact
       uses: actions/upload-artifact@v2
       with:
-        name: DebugSignaturesComparerApp
+        name: debug-signatures-comparer-app
         path: ./Build
 
