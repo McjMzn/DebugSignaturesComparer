@@ -17,11 +17,14 @@ jobs:
       with:
         dotnet-version: 3.1.101
         
-    - name: Build solution
-      working-directory: ./src
-      run: |
-        dotnet restore
-        dotnet build -c Release --no-restore
-    - name: Run tests
-      working-directory: ./src
-      run: dotnet test --no-restore
+    - name: Build library
+      working-directory: ./src/Vrasoft.DebugSignatures
+      run: dotnet build -c Release
+      
+    - name: Build CLI
+      working-directory: ./src/Vrasoft.DebugSignatures.ComparerCli
+      run: dotnet build -c Release
+    
+    - name: Build GUI
+      run: echo "Ommiting build due to platform limitations."  
+
