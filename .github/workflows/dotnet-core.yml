@@ -28,13 +28,7 @@ jobs:
     - name: Save library
       uses: actions/upload-artifact@v2
       with:
-          name: LibraryBuild
-          path: src/Vrasoft.DebugSignatures/bin/Release
-          
-    - name: Build CLI
-      working-directory: ./src/Vrasoft.DebugSignatures.ComparerCli
-      run: dotnet build -c Release
-    
-    - name: Build GUI
-      run: echo "Ommiting build due to platform limitations."  
+          path: src/Vrasoft.DebugSignatures/bin/Release/*nupkg
+                  
+ 
 
