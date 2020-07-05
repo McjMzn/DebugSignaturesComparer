@@ -28,9 +28,10 @@ jobs:
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }} 
       run: |
-        dotnet nuget push $(find -name '*.nupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY" --skip-duplicate --no-symbols true | find "Created"
-        if errorlevel 0 dotnet nuget push $(find -name '*.snupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY"
-      
+        if $(dotnet nuget push $(find -name '*.nupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY" --skip-duplicate --no-symbols true) | grep "Created"; then
+          errorlevel 0 dotnet nuget push $(find -name '*.snupkg') -s https://api.nuget.org/v3/index.json -k "$NUGET_API_KEY"
+        fi
+        
   build-cli-and-gui:
     runs-on: windows-latest
     
