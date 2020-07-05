@@ -10,6 +10,7 @@ Read files' debug signatures. Check if executable matches the debugging symbols 
 
 Available as [NuGet package](https://www.nuget.org/packages/Vrasoft.DebugSignatures/), contais utility classes that can be used to check and compare debug signatures of files. Supports Portable Executables, Program Databases and ZIP Archives.
 
+#### Reading Debug Signature
 ```c#
  // Portable Executables
  var dllReading = DebugSignaturesReader.ReadFromPortableExecutable("library.dll");
@@ -22,6 +23,22 @@ Available as [NuGet package](https://www.nuget.org/packages/Vrasoft.DebugSignatu
  var zipReadings = DebugSignaturesReader.ReadFromArchive("archive.zip");
  var nupkgReadings = DebugSignaturesReader.ReadFromArchive("Vrasoft.DebugSignatures.1.0.0.nupkg");
  var snupkgReadings = DebugSignaturesReader.ReadFromArchive("Vrasoft.DebugSignatures.1.0.0.snupkg");
+```
+#### Comparing Debug Signatures
+```c#
+// With bare DebugSignaturesReader
+var dllSignature = DebugSignaturesReader.ReadFromPortableExecutable("library.dll").DebugSignature;
+var pdbSignature = DebugSignaturesReader.ReadFromPortableExecutable("library.pdb").DebugSignature;
+var matching = dllSignature == pdbSignature;
+
+// With DebugSignaturesComparer's static method
+var matching = DebugSignaturesComparer.AreMatching("library.dll", "library.pdb");
+
+// With instance of DebugSignaturesComparer
+var comparer = new DebugSignaturesComparer();
+comparer.AddFile("library.dll");
+comparer.AddFile("library.pdb");
+var matching = comparer.AllMatching;
 ```
 
 ## Debug Signatures Comparer CLI
