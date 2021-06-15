@@ -22,7 +22,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: built-nuget-packages
-        path: src/Vrasoft.DebugSignatures/bin/Release/*nupkg
+        path: src/Signet/bin/Release/*nupkg
       
     - name: Publish NuGet packages
       env:
