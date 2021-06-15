@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -18,7 +18,7 @@ This package also provides a class that can be used to group readings by the sig
     <RepositoryUrl>https://github.com/McjMzn/DebugSignaturesComparer</RepositoryUrl>
     <PackageTags>pdb, pe, dll, signature, portable executable, program database, debug, debugging, signature reader</PackageTags>
     <PackageId>SigNET</PackageId>
-    <Authors>McjMzn</Authors>
+    <Authors>Maciej Mazan</Authors>
     <Company />
   </PropertyGroup>
 
