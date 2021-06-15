@@ -42,17 +42,6 @@ jobs:
       with:
         dotnet-version: '5.0.x'
       
-    - name: Download built NuGet packages
-      uses: actions/download-artifact@v2
-      with:
-        name: built-nuget-packages
-        path: local_nuget
-      
-    - name: Set local NuGet repository
-      run: |
-        cd local_nuget
-        dotnet nuget add source . -n local_nuget
-        
     - name: Build CLI
       run: dotnet build ./src/Signet.ComparerCli -c Release -o Build
       
