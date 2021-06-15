@@ -42,15 +42,22 @@ jobs:
       with:
         dotnet-version: '5.0.x'
       
-    - name: Build CLI
-      run: dotnet build ./src/Signet.ComparerCli -c Release -o Build
-      
-    - name: Build GUI
-      run: dotnet build ./src/Signet.ComparerGui -c Release -o Build
-      
+    - name: Build
+      run: | 
+        dotnet build ./src/Signet.ComparerCli -c Release -o build/regular
+        dotnet build ./src/Signet.ComparerGui -c Release -o build/regular
+    
+    - name: Build self-contained
+      run: |
+        dotnet publish ./src/Signet.ComparerGui -c Release -o build/self-contained/win-x64 --self-contained=true -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./src/Signet.ComparerCli -c Release -o build/self-contained/win-x64 --self-contained=true -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./src/Signet.ComparerCli -c Release -o build/self-contained/linux-x64 --self-contained=true -r linux-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./src/Signet.ComparerCli -c Release -o build/self-contained/osx-x64 --self-contained=true -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        
     - name: Save build artifact
       uses: actions/upload-artifact@v2
       with:
-        name: debug-signatures-comparer-app
-        path: ./Build
+        name: build
+        path: ./build
+      
 
