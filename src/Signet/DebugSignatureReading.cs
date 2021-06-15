@@ -1,4 +1,4 @@
-﻿namespace Vrasoft.DebugSignatures
+﻿namespace Signet
 {
     /// <summary>
     /// Represents reading of a debug signature.

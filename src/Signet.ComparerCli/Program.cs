@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Vrasoft.DebugSignatures;
 
-namespace Vrasoft.DebugSignatures.ComparerCli
+namespace Signet.ComparerCli
 {
     class Program
     {
@@ -21,7 +20,7 @@ namespace Vrasoft.DebugSignatures.ComparerCli
 
             debugSignaturesComparer.AddFiles(args.Distinct());
 
-            
+
             if (debugSignaturesComparer.Readings.Count == 0)
             {
                 PrintHelp();
@@ -53,16 +52,16 @@ namespace Vrasoft.DebugSignatures.ComparerCli
         {
             int windowWidth;
             try { windowWidth = Console.WindowWidth; } catch { windowWidth = 80; }
-            
+
             Func<string, string> FormatLine = text =>
             {
-                var margin = new String(' ', (windowWidth - text.Length - 1) / 2);
+                var margin = new string(' ', (windowWidth - text.Length - 1) / 2);
                 return $"{margin}{text}{margin}{Environment.NewLine}";
             };
 
-            var border = $"{new String('_', windowWidth)}{Environment.NewLine}";
+            var border = $"{new string('_', windowWidth)}{Environment.NewLine}";
 
-            var header = $"{border}{FormatLine("Debug Signatures Comparer CLI")}{FormatLine("1.1.0")}{FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{border}";
+            var header = $"{border}{FormatLine("SigNET - Debug Signatures Comparer CLI")}{FormatLine("1.2.0")}{FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{border}";
             Console.WriteLine(header);
         }
 

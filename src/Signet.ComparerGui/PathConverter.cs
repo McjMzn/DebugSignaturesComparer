@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Data;
 
-namespace Vrasoft.DebugSignatures.ComparerGui
+namespace Signet.ComparerGui
 {
     [ValueConversion(typeof(string), typeof(string))]
     class PathConverter : IValueConverter

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Vrasoft.DebugSignatures
+namespace Signet
 {
     /// <summary>
     /// Class used to trigger signature readings and group them by the signature's value.
@@ -25,7 +25,7 @@ namespace Vrasoft.DebugSignatures
         /// <summary>
         /// Gets a flag indicating if all successful readings shared the same debug signature.
         /// </summary>
-        public bool AllMatching => this.ReadingsBySignature.Keys.Count == 1;
+        public bool AllMatching => ReadingsBySignature.Keys.Count == 1;
 
         /// <summary>
         /// Checks if elements under the given paths have matching debug signatures.
@@ -54,8 +54,8 @@ namespace Vrasoft.DebugSignatures
         /// <param name="path">Paths to files.</param>
         public void AddFiles(IEnumerable<string> paths)
         {
-            paths = this.FlattenPathList(paths);
-            
+            paths = FlattenPathList(paths);
+
             foreach (var path in paths)
             {
                 try
@@ -83,13 +83,13 @@ namespace Vrasoft.DebugSignatures
             }
 
             // Remove duplicate files
-            this.Readings
+            Readings
                 .GroupBy(reading => reading.File)
                 .ToList()
                 .ForEach(group => group.Skip(1).ToList().ForEach(reading => Readings.Remove(reading)));
 
             // Group reading by signature
-            this.ReadingsBySignature = this.Readings
+            ReadingsBySignature = Readings
                 .GroupBy(reading => reading.DebugSignature)
                 .OrderByDescending(readings => readings.Count())
                 .ToDictionary(group => group.Key, group => group.ToList());

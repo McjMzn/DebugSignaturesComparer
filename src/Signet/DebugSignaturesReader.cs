@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
-namespace Vrasoft.DebugSignatures
+namespace Signet
 {
     /// <summary>
     /// Class that allows reading debug signature from: DLLs, EXEs, PDBs, NuGet packages, ZIP archives and directories.

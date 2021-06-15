@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>SignetGui</AssemblyName>
+    <Version>1.2.0</Version>
+    <Author>Maciej Mazan</Author>
+    <Copyright>Maciej Mazan</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Signet\Signet.csproj" />
+  </ItemGroup>
+  
+</Project>

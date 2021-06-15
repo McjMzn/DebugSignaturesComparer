@@ -4,9 +4,8 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using Vrasoft.DebugSignatures;
 
-namespace Vrasoft.DebugSignatures.ComparerGui
+namespace Signet.ComparerGui
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
@@ -17,7 +16,7 @@ namespace Vrasoft.DebugSignatures.ComparerGui
 
         public ObservableCollection<DebugSignatureReading> Readings => comparer.Readings as ObservableCollection<DebugSignatureReading>;
         public Dictionary<string, List<DebugSignatureReading>> ReadingsBySignature =>
-            this.Readings
+            Readings
                 .GroupBy(reading => reading.DebugSignature)
                 .OrderByDescending(readings => readings.Count())
                 .ToDictionary(group => group.Key, group => group.ToList());
