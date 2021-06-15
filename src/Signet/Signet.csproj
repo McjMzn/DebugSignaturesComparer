@@ -17,6 +17,9 @@ This package also provides a class that can be used to group readings by the sig
 </Description>
     <RepositoryUrl>https://github.com/McjMzn/DebugSignaturesComparer</RepositoryUrl>
     <PackageTags>pdb, pe, dll, signature, portable executable, program database, debug, debugging, signature reader</PackageTags>
+    <PackageId>SigNET</PackageId>
+    <Authors>McjMzn</Authors>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>
