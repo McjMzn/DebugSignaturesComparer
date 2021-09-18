@@ -17,7 +17,7 @@ namespace Signet.ComparerGui
         private void FilesDropped(object sender, DragEventArgs e)
         {
             var paths = e.Data.GetData(DataFormats.FileDrop, true) as string[];
-            (DataContext as MainWindowViewModel).AddFiles(paths);
+            (DataContext as MainWindowViewModel).AddItems(paths);
         }
 
         private void LogTextBox_TextChanged(object sender, TextChangedEventArgs e)

@@ -5,59 +5,99 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Text;
 
 namespace Signet
 {
     /// <summary>
-    /// Class that allows reading debug signature from: DLLs, EXEs, PDBs, NuGet packages, ZIP archives and directories.
+    /// Class that allows reading debug signature from: program databases, portable executables, nuget packages (including symbols) and zip archives.
     /// </summary>
-    public class DebugSignaturesReader
+    public class DebugSignaturesReader : IDebugSignaturesReader
     {
-        public static string[] ProgramDatabaseExtensions = new[] { ".pdb" };
-        public static string[] PortableExecutableExtensions = new[] { ".dll", ".exe", ".sys" };
-        public static string[] ArchiveExtensions = new[] { ".zip", ".nupkg", ".snupkg" };
-        public static string[] SupportedExtensions = PortableExecutableExtensions.Concat(ArchiveExtensions).Concat(ProgramDatabaseExtensions).ToArray();
+        private static string[] ProgramDatabaseExtensions = new[] { ".pdb" };
+        private static string[] PortableExecutableExtensions = new[] { ".dll", ".exe", ".sys" };
+        private static string[] ArchiveExtensions = new[] { ".zip", ".nupkg", ".snupkg" };
+        
+        /// <summary>
+        /// Gets the list of file extensions supported by this reader.
+        /// </summary>
+        public static string[] SupportedExtensions =>
+            PortableExecutableExtensions
+                .Concat(ArchiveExtensions)
+                .Concat(ProgramDatabaseExtensions)
+                .ToArray();
 
         /// <summary>
-        /// Reads the debug signature from the given Portable Executable (i.e. DLL or EXE.) file.
+        /// <inheritdoc/>
+        /// <para>Supported files: .pdb .dll .exe .sys .nupkg .snupkg .zip</para>
         /// </summary>
-        /// <param name="portableExecutable">Path to the PE file.</param>
-        /// <returns>Debug signature reading.</returns>
-        public static DebugSignatureReading ReadFromPortableExecutable(string portableExecutable)
+        public List<DebugSignatureReading> Read(string path)
         {
-            using (var portableExecutableStream = File.OpenRead(portableExecutable))
+            path = Path.GetFullPath(path);
+            if (!File.Exists(path) && !Directory.Exists(path))
             {
-                return new DebugSignatureReading(portableExecutable, ReadFromPortableExecutableStream(portableExecutableStream));
+                return new List<DebugSignatureReading> { new DebugSignatureReading(path, string.Empty, $"File or directory {path} does not exist.") };
+            }
+
+            var filesToRead = Directory.Exists(path) ? this.GetSupportedFilesFromDirectory(path) : new List<string> { path };
+
+            return filesToRead.SelectMany(this.ReadFromAnyFile).ToList();
+        }
+
+        private List<DebugSignatureReading> ReadFromAnyFile(string filePath)
+        {
+            try
+            {
+                var extension = Path.GetExtension(filePath);
+                switch (extension)
+                {
+                    case var pdbExtension when ProgramDatabaseExtensions.Contains(extension):
+                        return new List<DebugSignatureReading> { this.ReadFromProgramDatabase(filePath) };
+
+                    case var peExtension when PortableExecutableExtensions.Contains(extension):
+                        return new List<DebugSignatureReading> { this.ReadFromPortableExecutable(filePath) };
+
+                    case var archiveExtension when ArchiveExtensions.Contains(extension):
+                        return this.ReadFromArchive(filePath);
+
+                    default:
+                        throw new NotSupportedException($"File {filePath} is of unsupported type.");
+                }
+            }
+            catch (Exception e)
+            {
+                return new List<DebugSignatureReading> { new DebugSignatureReading(filePath, null, e.Message) };
             }
         }
 
-        /// <summary>
-        /// Reads the debug signature from the given Program Database (PDB) file.
-        /// </summary>
-        /// <param name="executablePath">Path to the PDB file.</param>
-        /// <returns>Debug signature reading.</returns>
-        public static DebugSignatureReading ReadFromProgramDatabase(string pdbPath)
+        private DebugSignatureReading ReadFromPortableExecutable(string portableExecutablePath)
         {
+            portableExecutablePath = Path.GetFullPath(portableExecutablePath);
+            using (var portableExecutableStream = File.OpenRead(portableExecutablePath))
+            {
+                return new DebugSignatureReading(portableExecutablePath, this.ReadFromPortableExecutableStream(portableExecutableStream));
+            }
+        }
+
+        private DebugSignatureReading ReadFromProgramDatabase(string pdbPath)
+        {
+            pdbPath = Path.GetFullPath(pdbPath);
             using (var pdbStream = File.OpenRead(pdbPath))
             {
-                return new DebugSignatureReading(pdbPath, ReadFromProgramDatabase(pdbStream));
+                return new DebugSignatureReading(pdbPath, this.ReadFromProgramDatabaseStream(pdbStream));
             }
         }
 
-        /// <summary>
-        /// Reads the debug signatures of DLLs, EXEs, PDBs, NUPKGs, SNUPKGs and ZIPs that the given archive contains.
-        /// </summary>
-        /// <param name="executablePath">Path to the archive.</param>
-        /// <returns>List of debug signature readings.</returns>
-        public static List<DebugSignatureReading> ReadFromArchive(string packagePath)
+        private List<DebugSignatureReading> ReadFromArchive(string packagePath)
         {
             var signatures = new List<DebugSignatureReading>();
             using (var archive = ZipFile.OpenRead(packagePath))
             {
                 archive.Entries.ToList().ForEach(packedFile =>
                 {
-                    var isExe = PortableExecutableExtensions.Contains(Path.GetExtension(packedFile.Name));
-                    var isPdb = ProgramDatabaseExtensions.Contains(packedFile.Name);
+                    var fileExtension = Path.GetExtension(packedFile.Name);
+                    var isExe = PortableExecutableExtensions.Contains(fileExtension);
+                    var isPdb = ProgramDatabaseExtensions.Contains(fileExtension);
 
                     if (isExe || isPdb)
                     {
@@ -68,8 +108,15 @@ namespace Signet
                             packedFileStream.CopyTo(memoryStream);
                             memoryStream.Position = 0;
 
-                            var signature = isPdb ? ReadFromProgramDatabase(memoryStream) : ReadFromPortableExecutableStream(memoryStream);
-                            signatures.Add(new DebugSignatureReading($"[{packagePath}]/{packedFile.FullName}", signature));
+                            try
+                            {
+                                var signature = isPdb ? this.ReadFromProgramDatabaseStream(memoryStream) : this.ReadFromPortableExecutableStream(memoryStream);
+                                signatures.Add(new DebugSignatureReading($"{Path.Combine(packagePath, packedFile.FullName)}", signature));
+                            }
+                            catch (Exception e)
+                            {
+                                signatures.Add(new DebugSignatureReading($"{Path.Combine(packagePath, packedFile.FullName)}", null, e.Message));
+                            }
                         }
                     }
                 });
@@ -78,7 +125,7 @@ namespace Signet
             }
         }
 
-        private static string ReadFromPortableExecutableStream(Stream inputStream)
+        private string ReadFromPortableExecutableStream(Stream inputStream)
         {
             using (var peReader = new PEReader(inputStream))
             {
@@ -89,7 +136,7 @@ namespace Signet
             }
         }
 
-        private static string ReadFromProgramDatabase(Stream pdbStream)
+        private string ReadFromProgramDatabaseStream(Stream pdbStream)
         {
             var metadataProvider = MetadataReaderProvider.FromPortablePdbStream(pdbStream);
             var metadataReader = metadataProvider.GetMetadataReader();
@@ -97,6 +144,14 @@ namespace Signet
             var guid = id.Guid.ToString("N");
 
             return $"{guid}FFFFFFFF".ToUpper();
+        }
+
+        private List<string> GetSupportedFilesFromDirectory(string directoryPath)
+        {
+            return
+                Directory.GetFiles(directoryPath, "*", SearchOption.AllDirectories)
+                .Where(file => SupportedExtensions.Contains(Path.GetExtension(file)))
+                .ToList();
         }
     }
 }

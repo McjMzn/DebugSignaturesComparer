@@ -1,119 +1,123 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace Signet
 {
     /// <summary>
-    /// Class used to trigger signature readings and group them by the signature's value.
+    /// Class wrapping the <see cref="IDebugSignaturesReader"/> that can be used to comparing the debug signatures of given files.
     /// </summary>
     public class DebugSignaturesComparer
     {
-        /// <summary>
-        /// Invoked when an error occures during processing.
-        /// </summary>
-        public EventHandler<string> ProcessingError;
+        private IDebugSignaturesReader reader;
 
         /// <summary>
-        /// List of successfull readings done by this instance.
+        /// Initializes a new instance of <see cref="DebugSignaturesComparer"/>.
         /// </summary>
-        public IList<DebugSignatureReading> Readings { get; set; } = new List<DebugSignatureReading>();
-
-        public IDictionary<string, List<DebugSignatureReading>> ReadingsBySignature { get; set; } = new Dictionary<string, List<DebugSignatureReading>>();
+        public DebugSignaturesComparer()
+            : this(new DebugSignaturesReader())
+        {
+        }
 
         /// <summary>
-        /// Gets a flag indicating if all successful readings shared the same debug signature.
+        /// Initializes a new instance of <see cref="DebugSignaturesComparer"/>.
         /// </summary>
-        public bool AllMatching => ReadingsBySignature.Keys.Count == 1;
+        /// <param name="reader">Debug signatures reader.</param>
+        public DebugSignaturesComparer(IDebugSignaturesReader reader)
+        {
+            this.Readings = new List<DebugSignatureReading>();
+            this.reader = reader;
+        }
+
+        /// <summary>
+        /// Gets the list of readings based on files added to this comparer.
+        /// </summary>
+        public List<DebugSignatureReading> Readings { get; }
+        
+        /// <summary>
+        /// Gets the list of failed readings.
+        /// </summary>
+        public List<DebugSignatureReading> FailedReadings =>
+            this.Readings
+                .Where(r => !r.IsSuccessful)
+            .ToList();
+
+        /// <summary>
+        /// Gets the dictionary with debug signatures as keys and the lists of readings with the signature matching the key as value.
+        /// </summary>
+        public Dictionary<string, List<DebugSignatureReading>> ReadingsBySignature =>
+            this.Readings
+                .Where(r => r.IsSuccessful)
+                .GroupBy(r => r.DebugSignature)
+                .OrderByDescending(readings => readings.Count())
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+        /// <summary>
+        /// Gets the bool value telling if all successful reading share the same debug signature.
+        /// </summary>
+        public bool ReadingsMatched =>
+            this.Readings.Count(r => r.IsSuccessful) > 1 &&
+            this.Readings.Where(r => r.IsSuccessful).GroupBy(r => r.DebugSignature).Count() == 1;
+
+        /// <summary>
+        /// Checks if items under the given paths have matching debug signatures.
+        /// </summary>
+        /// <param name="paths">Paths to check.</param>
+        /// <returns>True if are matching, false otherwise.</returns>
+        public static bool AreMatching(IEnumerable<string> items)
+        {
+            return AreMatching(items, new DebugSignaturesReader());
+        }
 
         /// <summary>
         /// Checks if elements under the given paths have matching debug signatures.
         /// </summary>
         /// <param name="paths">Paths to check.</param>
+        /// <param name="reader">Debug signature reader to use.</param>
         /// <returns>True if are matching, false otherwise.</returns>
-        public static bool AreMatching(params string[] paths)
+        public static bool AreMatching(IEnumerable<string> items, IDebugSignaturesReader reader)
         {
-            var comparer = new DebugSignaturesComparer();
-            comparer.AddFiles(paths);
-            return comparer.AllMatching;
+            var comparer = new DebugSignaturesComparer(reader);
+            comparer.AddItems(items);
+
+            return comparer.ReadingsBySignature.Keys.Count == 1;
         }
 
         /// <summary>
-        /// Adds file or directory to the comparison - reads its debug signature and adds the result to <see cref="Readings"/>.
+        /// Add a file or a directory to the comparer.
         /// </summary>
-        /// <param name="path">Path to the file.</param>
-        public void AddFile(string path)
+        /// <param name="item">The item.</param>
+        public void AddItem(string item)
         {
-            AddFiles(new[] { path });
-        }
-
-        /// <summary>
-        /// Adds files or directories to the comparison - reads their debug signature and adds the results to <see cref="Readings"/>.
-        /// </summary>
-        /// <param name="path">Paths to files.</param>
-        public void AddFiles(IEnumerable<string> paths)
-        {
-            paths = FlattenPathList(paths);
-
-            foreach (var path in paths)
+            var readings = this.reader.Read(item);
+            foreach(var reading in readings)
             {
-                try
+                var conflictingReading = this.Readings.FirstOrDefault(r => r.File == reading.File);
+                if (conflictingReading != null)
                 {
-                    switch (path)
-                    {
-                        case string pdbPath when File.Exists(pdbPath) && DebugSignaturesReader.ProgramDatabaseExtensions.Contains(Path.GetExtension(pdbPath)):
-                            Readings.Add(DebugSignaturesReader.ReadFromProgramDatabase(pdbPath));
-                            break;
-                        case string exePath when File.Exists(exePath) && DebugSignaturesReader.PortableExecutableExtensions.Contains(Path.GetExtension(exePath)):
-                            Readings.Add(DebugSignaturesReader.ReadFromPortableExecutable(exePath));
-                            break;
-                        case string archivePath when File.Exists(archivePath) && DebugSignaturesReader.ArchiveExtensions.Contains(Path.GetExtension(archivePath)):
-                            DebugSignaturesReader.ReadFromArchive(archivePath).ForEach(Readings.Add);
-                            break;
-                        default:
-                            ProcessingError?.Invoke(this, $"Could not handle item: \"{path}\". Ensure that path is valid and points to supported type of resource.");
-                            break;
-                    }
+                    this.Readings.Remove(conflictingReading);
                 }
-                catch (Exception e)
-                {
-                    ProcessingError?.Invoke(this, $"Exception occured during processing item: \"{path}\". Exception message {e.Message}");
-                }
+
+                this.Readings.Add(reading);
             }
-
-            // Remove duplicate files
-            Readings
-                .GroupBy(reading => reading.File)
-                .ToList()
-                .ForEach(group => group.Skip(1).ToList().ForEach(reading => Readings.Remove(reading)));
-
-            // Group reading by signature
-            ReadingsBySignature = Readings
-                .GroupBy(reading => reading.DebugSignature)
-                .OrderByDescending(readings => readings.Count())
-                .ToDictionary(group => group.Key, group => group.ToList());
         }
 
         /// <summary>
-        /// Processes the given list of paths. Replaces directory paths with paths to supported files within them.
+        /// Add a list of file or directories to the comparer.
         /// </summary>
-        /// <param name="paths">List of paths</param>
-        /// <returns>List of file paths</returns>
-        private List<string> FlattenPathList(IEnumerable<string> paths)
+        /// <param name="item">The item.</param>
+        public void AddItems(IEnumerable<string> items)
         {
-            return paths
-                .ToList()
-                .SelectMany(path =>
-                {
-                    var isDirectory = Directory.Exists(path);
-                    if (!isDirectory)
-                    {
-                        return new[] { path };
-                    }
+            items.ToList().ForEach(this.AddItem);
+        }
 
-                    return Directory.GetFiles(path, "*", SearchOption.AllDirectories).Where(file => DebugSignaturesReader.SupportedExtensions.Contains(Path.GetExtension(file)));
-                }).Distinct().ToList();
+        /// <summary>
+        /// Clears the readings list.
+        /// </summary>
+        public void ClearReadings()
+        {
+            this.Readings.Clear();
         }
     }
 }

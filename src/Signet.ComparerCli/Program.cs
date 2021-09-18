@@ -7,32 +7,28 @@ namespace Signet.ComparerCli
     {
         static void Main(string[] args)
         {
-
             PrintHeader();
-
-            var debugSignaturesComparer = new DebugSignaturesComparer();
-            debugSignaturesComparer.ProcessingError += (sender, message) =>
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine(message);
-                Console.ResetColor();
-            };
-
-            debugSignaturesComparer.AddFiles(args.Distinct());
-
-
-            if (debugSignaturesComparer.Readings.Count == 0)
+            if (args.Count() == 0 || args.Any(a => a == "h" || a == "help" || a == "-h" || a == "--help"))
             {
                 PrintHelp();
+                return;
             }
-            else
-            {
-                PrintReadings(debugSignaturesComparer);
-            }
+
+            var debugSignaturesComparer = new DebugSignaturesComparer();
+            debugSignaturesComparer.AddItems(args.Distinct());
+
+            PrintReadings(debugSignaturesComparer);
         }
 
         static void PrintReadings(DebugSignaturesComparer comparer)
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            comparer.FailedReadings.ForEach(failedReading =>
+            {
+                Console.WriteLine($"Failed to read signature from file: {failedReading.File}.{Environment.NewLine}Error message: {failedReading.Error}{Environment.NewLine}");
+            });
+            Console.ResetColor();
+
             comparer.ReadingsBySignature.Keys.ToList().ForEach(signature =>
             {
                 var files = comparer.ReadingsBySignature[signature];
@@ -61,7 +57,8 @@ namespace Signet.ComparerCli
 
             var border = $"{new string('_', windowWidth)}{Environment.NewLine}";
 
-            var header = $"{border}{FormatLine("SigNET - Debug Signatures Comparer CLI")}{FormatLine("1.2.0")}{FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{border}";
+            var signetVersion = typeof(DebugSignaturesReader).Assembly.GetName().Version;
+            var header = $"{border}{FormatLine("SigNET - Debug Signatures Comparer CLI")}{FormatLine(signetVersion.ToString())}{FormatLine("https://github.com/McjMzn/DebugSignaturesComparer")}{border}";
             Console.WriteLine(header);
         }
 
