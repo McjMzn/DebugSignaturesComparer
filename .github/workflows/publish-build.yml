@@ -47,7 +47,7 @@ jobs:
         dotnet publish ./src/Signet.ComparerGui -c Release -o build/win-x64 --self-contained=false -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
         dotnet publish ./src/Signet.ComparerCli -c Release -o build/win-x64 --self-contained=false -r win-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
         dotnet publish ./src/Signet.ComparerCli -c Release -o build/linux-x64 --self-contained=false -r linux-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
-        dotnet publish ./src/Signet.ComparerCli -c Release -o build/osx-x64 --self-contained=true -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+        dotnet publish ./src/Signet.ComparerCli -c Release -o build/osx-x64 --self-contained=false -r osx-x64 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
         
     - name: Save build artifact
       uses: actions/upload-artifact@v2
