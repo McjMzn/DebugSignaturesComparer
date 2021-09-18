@@ -12,23 +12,27 @@ Available as [NuGet package](https://www.nuget.org/packages/SigNET/), contais ut
 
 #### Reading Debug Signature
 ```c#
+var debugSignaturesReader = new DebugsignaturesReader();
+List<DebugSignatureReading> readings;
+
  // Portable Executables
- var dllReading = DebugSignaturesReader.ReadFromPortableExecutable("library.dll");
- var exeReading = DebugSignaturesReader.ReadFromPortableExecutable("program.exe");
-  
+ readings = debugSignaturesReader.Read("library.dll");
+ readings = debugSignaturesReader.Read("program.exe");
+   
  // Program Databases
- var pdbReading = DebugSignaturesReader.ReadFromProgramDatabase("program.pdb");
+ readings = debugSignaturesReader.Read("program.pdb");
  
  // Archives
- var zipReadings = DebugSignaturesReader.ReadFromArchive("archive.zip");
- var nupkgReadings = DebugSignaturesReader.ReadFromArchive("Vrasoft.DebugSignatures.1.0.0.nupkg");
- var snupkgReadings = DebugSignaturesReader.ReadFromArchive("Vrasoft.DebugSignatures.1.0.0.snupkg");
+ readings = debugSignaturesReader.Read("archive.zip");
+ readings = debugSignaturesReader.Read("nuget.package.1.0.0.nupkg");
+ readings = debugSignaturesReader.Read("symbols.package.1.0.0.snupkg");
 ```
 #### Comparing Debug Signatures
 ```c#
 // With bare DebugSignaturesReader
-var dllSignature = DebugSignaturesReader.ReadFromPortableExecutable("library.dll").DebugSignature;
-var pdbSignature = DebugSignaturesReader.ReadFromPortableExecutable("library.pdb").DebugSignature;
+var debugSignaturesReader = new DebugsignaturesReader();
+var dllSignature = debugSignaturesReader.Read("library.dll").Single().DebugSignature;
+var pdbSignature = debugSignaturesReader.Read("library.pdb").Single().DebugSignature;
 var matching = dllSignature == pdbSignature;
 
 // With DebugSignaturesComparer's static method
@@ -36,9 +40,9 @@ var matching = DebugSignaturesComparer.AreMatching("library.dll", "library.pdb")
 
 // With instance of DebugSignaturesComparer
 var comparer = new DebugSignaturesComparer();
-comparer.AddFile("library.dll");
-comparer.AddFile("library.pdb");
-var matching = comparer.AllMatching;
+comparer.AddItem("library.dll");
+comparer.AddItem("library.pdb");
+var matching = comparer.ReadingsMatched;
 ```
 
 ## Debug Signatures Comparer CLI
@@ -53,4 +57,5 @@ Compare debug signatures directly from command line interface.
 ![Platform](https://img.shields.io/badge/OS-Windows-lightgrey)
 
 Simple Drag-and-Drop application allowing to easily check if files have matching debug signature.
-![cli-image-1](https://i.imgur.com/fUw0JyA.png "SigNET - Debug Signatures Comparer GUI")
+![gui-image-1](https://i.imgur.com/XKZ2b7B.png "SigNET - Debug Signatures Comparer GUI #1")
+![gui-image-2](https://i.imgur.com/fUw0JyA.png "SigNET - Debug Signatures Comparer GUI #2")
