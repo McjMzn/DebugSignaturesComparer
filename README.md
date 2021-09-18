@@ -46,11 +46,11 @@ var matching = comparer.AllMatching;
 ![Platform](https://img.shields.io/badge/OS-Windows%20|%20Linux%20|%20MacOS-lightgrey)
 
 Compare debug signatures directly from command line interface.
-![cli-image-1](https://i.imgur.com/K6NlOxY.png "Debug Signatures Comparer CLI")
+![cli-image-1](https://i.imgur.com/K6NlOxY.png "SigNET - Debug Signatures Comparer CLI")
 
 ## Debug Signatures Comparer GUI
 ![Platform](https://img.shields.io/badge/.NET-5.0%20WPF-blue)
 ![Platform](https://img.shields.io/badge/OS-Windows-lightgrey)
 
 Simple Drag-and-Drop application allowing to easily check if files have matching debug signature.
-![cli-image-1](https://i.imgur.com/3CxTfea.png "Debug Signatures Comparer GUI")
+![cli-image-1](https://i.imgur.com/fUw0JyA.png "SigNET - Debug Signatures Comparer GUI")
