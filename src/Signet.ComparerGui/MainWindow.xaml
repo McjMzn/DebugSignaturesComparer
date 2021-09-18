@@ -106,7 +106,7 @@
                                 <Thumb Background="{StaticResource PrimaryDark}">
                                     <Thumb.Template>
                                         <ControlTemplate>
-                                            <Border CornerRadius="3" Width="10" Background="{StaticResource PrimaryDark}" Margin="0, 0, 3, 0">
+                                            <Border CornerRadius="3" Width="8" Background="{StaticResource PrimaryDark}" Margin="0, 0, 3, 3">
                                             </Border>
                                         </ControlTemplate>
                                     </Thumb.Template>
@@ -118,17 +118,6 @@
             </Setter>
         </Style>
 
-        <Style x:Key="ThumbStyle" TargetType="Thumb">
-            <Setter Property="OverridesDefaultStyle" Value="True"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Thumb">
-                        <Border Width="20" Height="100" Background="Red" BorderThickness="0" BorderBrush="Pink"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        
         <local:PathConverter x:Key="pathConverter"/>
     </Window.Resources>
     
