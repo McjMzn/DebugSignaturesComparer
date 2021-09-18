@@ -15,7 +15,7 @@ jobs:
         dotnet-version: '5.0.x'
     
     - name: Run unit tests
-      working-directory: ./src
+      working-directory: ./src/Signet.Tests
       run: dotnet test
 
     - name: Build library
